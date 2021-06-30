@@ -1,0 +1,368 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{bbm}
+
+\title{SysBio2}
+\author{404018}
+\date{May 2021}
+
+\begin{document}
+
+\maketitle
+
+\section*{Part A}
+
+Considering the equation system 
+
+\begin{equation}
+\begin{aligned}
+& x_1 \overset{\lambda_1}{\longrightarrow}x_1 + b \qquad & x_2 \overset{\lambda_2x_1}{\longrightarrow} x_2 + 1 \\
+& x_1 \overset{\beta_1x_1}{\longrightarrow}x_1 - 1 \qquad & x_2 \overset{\beta_2x_2}{\longrightarrow} x_2 - 1
+\end{aligned}
+\end{equation}
+
+The CME would be as follows:
+
+\begin{equation}
+\begin{split}
+\frac{dP(x_1, x_2)}{dt} = &\underbrace{\lambda_1 P(x_1 - b,  x_2) - \lambda_1 P(x_1, x_2)}_\textrm{Synthesis of $x_1$} + \underbrace{\beta_1(x_1 + 1)P(x_1 + 1,  x_2) - \beta_1x_1 P(x_1, x_2)}_\textrm{Degradation of $x_1$} +\\
+&\underbrace{\lambda_2x_1P(x_1, x_2 - 1) - \lambda_2x_1P(x_1, x_2)}_\textrm{Synthesis of $x_2$} + \underbrace{\beta_2(x_2 + 1)P(x_1,  x_2 + 1) - \beta_2x_2 P(x_1, x_2)}_\textrm{Degradation of $x_2$}
+\end{split}
+\end{equation}
+
+\section*{Part B}
+Using the method of exponents we can find H:
+
+\begin{equation}
+    H = \begin{bmatrix}
+    1 & 0 \\
+    -1 & 1
+    \end{bmatrix}
+\end{equation}
+
+As $M_{ij} = \frac{H_{ij}}{\tau_{i}}$ then we can find M:
+
+\begin{equation}
+    M = \begin{bmatrix}
+    \frac{1}{\tau_1} & 0 \\
+    -\frac{1}{\tau_2} & \frac{1}{\tau_2}
+    \end{bmatrix}
+\end{equation}
+
+Next we need to calculate the average step size for $x_1$ in order to calculate $D$. Using the definition of step size:
+
+\begin{equation}
+    \begin{split}
+        \langle s_x \rangle &= \sum_k |\delta_k|\frac{|\delta_k|\langle r_k(x)\rangle}{\sum_l|\delta_l|\langle r_l(x)\rangle}\\
+        &= \frac{b^2\lambda_1 + 1^2\beta_1\langle x_1\rangle}{b\lambda_1 + 1\beta_1\langle x_1\rangle} \\
+        &= \frac{b^2\lambda_1 + \langle x_1\rangle\frac{1}{\tau_1}}{b\lambda_1 + \langle x_1\rangle\frac{1}{\tau_1}} \\
+        &= \frac{b^2\lambda_1\tau_1 + \langle x_1\rangle}{b\lambda_1\tau_1 + \langle x_1\rangle} 
+    \end{split}
+\end{equation}
+
+We can calculate the relationship between $\lambda_1$ and lifetimes using the equation for the change in abundance of $x_1$ and assuming stationarity:
+
+\begin{equation}
+\begin{split}
+\frac{d\langle x_1\rangle}{dt} &= \langle R^+_1\rangle - \langle R^-_1\rangle \\
+&= b\lambda_1 - \beta_1\langle x_1\rangle
+\end{split}
+\end{equation}
+
+Setting $\frac{d\langle x_1\rangle}{dt} = 0$ and using the equivalence $\beta_1 = \frac{1}{\tau_1}$
+
+\begin{equation}
+    \begin{split}
+        0 &= b\lambda_1 - \frac{1}{\tau_1}\langle x_1\rangle \\
+         b\lambda_1 &= \frac{1}{\tau_1}\langle x_1\rangle  \\
+         \lambda_1 &= \frac{1}{b}\frac{1}{\tau_1}\langle x_1\rangle
+    \end{split}
+\end{equation}
+
+Substituting this into the equation for $\langle x_1\rangle$ we get:
+
+\begin{equation}
+    \begin{split}
+        \langle s_1\rangle &= \frac{b^2\lambda_1\tau_1 + \langle x_1\rangle}{b\lambda_1\tau_1 + \langle x_1\rangle} \\
+        &= \frac{b^2\tau_1\frac{1}{b}\frac{1}{\tau_1}\langle x_1\rangle + \langle x_1\rangle}{b\tau_1\frac{1}{b}\frac{1}{\tau_1}\langle x_1\rangle + \langle x_1\rangle} \\
+        &= \frac{b\langle x_1\rangle + \langle x_1\rangle}{\langle x_1\rangle + \langle x_1\rangle} \\
+        &= \frac{\langle x_1\rangle(1 + b)}{2\langle x_1\rangle}\\
+        &= \frac{(1 + b)}{2}
+    \end{split}
+\end{equation}
+ 
+
+We can plug this into the equation for $D_{ii} = \frac{2}{\tau_i}\frac{\langle s_i\rangle}{\langle x_i\rangle}$, considering that the average step size for $x_2$ is 1. We can also consider the off diagonal elements of $D$ to be zero as there are no equations requiring or producing both $x_1$ and $x_2$. This gives D:
+
+\begin{equation}
+    D = \begin{bmatrix}
+    \frac{1}{\tau_1}\frac{1 + b}{\langle x_1\rangle} & 0 \\
+    0 & \frac{2}{\tau_2}\frac{1}{\langle x_2\rangle}
+    \end{bmatrix}
+\end{equation}
+
+Next we can calculate $\eta$ using the relationship $M\eta + (M\eta)^T = D$:
+
+\begin{equation}
+    \begin{split}
+        M\eta &= \begin{bmatrix}
+    \frac{1}{\tau_1} & 0 \\
+    -\frac{1}{\tau_2} & \frac{1}{\tau_2}
+    \end{bmatrix}
+    \begin{bmatrix}
+    \eta_{11} & \eta_{12} \\
+    \eta_{21} & \eta_{22}
+    \end{bmatrix} \\
+    &= \begin{bmatrix}
+    \frac{\eta_{11}}{\tau_1} & \frac{\eta_{12}}{\tau_1} \\
+    \frac{1}{\tau_2}(-\eta_{11} + \eta_{21}) & \frac{1}{\tau_2}(-\eta_{12} + \eta_{22})
+    \end{bmatrix} \\
+    M\eta + (M\eta)^T &= \begin{bmatrix}
+    \frac{\eta_{11}}{\tau_1} & \frac{\eta_{12}}{\tau_1} \\
+    \frac{1}{\tau_2}(-\eta_{11} + \eta_{21}) & \frac{1}{\tau_2}(-\eta_{12} + \eta_{22})
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+    \frac{\eta_{11}}{\tau_1} &  \frac{1}{\tau_2}(-\eta_{11} + \eta_{21})\\
+    \frac{\eta_{12}}{\tau_1} & \frac{1}{\tau_2}(-\eta_{12} + \eta_{22})
+    \end{bmatrix} = D\\
+    &= \begin{bmatrix}
+    \frac{2\eta_{11}}{\tau_1} & \frac{\eta_{12}}{\tau_1} + \frac{1}{\tau_2}(-\eta_{11} + \eta_{21}) \\
+    \frac{\eta_{12}}{\tau_1} + \frac{1}{\tau_2}(-\eta_{11} + \eta_{21})  & \frac{2}{\tau_2}(-\eta_{12} + \eta_{22})
+    \end{bmatrix} = 
+    \begin{bmatrix}
+    \frac{1}{\tau_1}\frac{1 + b}{\langle x_1\rangle} & 0 \\
+    0 & \frac{2}{\tau_2}\frac{1}{\langle x_2\rangle}
+    \end{bmatrix}
+    \end{split}
+\end{equation}
+
+We know that $\eta_{21} = \eta_{12}$ so we can now write 3 simultaneous equations:
+
+\begin{equation}
+\begin{split}
+\frac{2\eta_{11}}{\tau_1} = \frac{1}{\tau_1}\frac{1 + b}{\langle x_1\rangle} \  &\Longrightarrow \ \eta_{11} = \frac{1 + b}{2}\frac{1}{\langle x_1\rangle} \\
+0 = \frac{\eta_{12}}{\tau_1} + \frac{1}{\tau_2}(-\eta_{11} + \eta_{12}) \ &\Longrightarrow \ \eta_{12} = \frac{\eta_{11}\tau_1}{\tau_1 + \tau_2} \\
+\frac{2}{\tau_2}(-\eta_{12} + \eta_{22}) = \frac{2}{\tau_2}\frac{1}{\langle x_2\rangle} \ &\Longrightarrow \  \eta_{22} = \frac{1}{\langle x_2\rangle} + \eta_{12}
+\end{split}
+\end{equation}
+
+
+Having solved $\eta_{11}$ in terms of abundance and lifetimes we can now substitute into the other equations:
+
+\begin{equation}
+\begin{split}
+\eta_{12} &= \frac{1 + b}{2}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2}\\
+\eta_{22} &= \frac{1}{\langle x_2\rangle} + \frac{1 + b}{2}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2}
+\end{split}
+\end{equation}
+
+Is your statement exact or approx - should be exact as these are linear equations?
+
+\section*{Part C}
+We can first consider the case where $b = 1$:
+\begin{equation}
+    \begin{split}
+    \eta_{11} &= \underbrace{\frac{1 + b}{2}}_\textrm{$= 1$}\frac{1}{\langle x_1\rangle} \\
+    \eta_{12} &= \underbrace{\frac{1 + b}{2}}_\textrm{$=1$}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2}\\
+\eta_{22} &= \frac{1}{\langle x_2\rangle} + \underbrace{\frac{1 + b}{2}}_\textrm{$=1$}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2} 
+\end{split}
+\end{equation}
+
+In this case $\eta_{11} = \frac{1}{\langle x_1 \rangle}$ and therefore will be at the level of the poisson noise for this system. When $\tau_1 >> \tau_2$,  $\eta_{22} \approx \frac{1}{\langle x_2\rangle} + \frac{1}{\langle x_1\rangle}$ but when $\tau_1 << \tau_2$,  $\eta_{22} \approx \frac{1}{\langle x_2\rangle}$. Therefore we can see here that in the case of a non-bursting mRNA a long-lived protein and shortlived mRNA minimises variability in the protein level. This is unsurprising as a longlived protein will have slower fluctuations and therefore is likely to have a lower variability.
+
+We can now consider the case where $b > 1$:
+
+\begin{equation}
+    \begin{split}
+    \eta_{11} &= \underbrace{\frac{1 + b}{2}}_\textrm{large}\frac{1}{\langle x_1\rangle} \\
+    \eta_{12} &= \underbrace{\frac{1 + b}{2}}_\textrm{large}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2}\\
+\eta_{22} &= \frac{1}{\langle x_2\rangle} + \underbrace{\frac{1 + b}{2}}_\textrm{large}\frac{1}{\langle x_1\rangle}\frac{\tau_1}{\tau_1 + \tau_2} 
+\end{split}
+\end{equation}
+
+We can see that for $\eta_{11}$ increasing $b$ i.e. mRNA being produced in bursts will increase $\eta_{11}$, and the only way for the cell to reduce normalised variance for $x_1$ is by increasing  $\langle x_1 \rangle$ - in  this way variation will be proportionally smaller making the normalised variance smaller. 
+
+We can now consider $\eta_{22}$. In the case where $\tau_1 << \tau_2$ (a shortlived mRNA but longlived protein) $\frac{\tau_1}{\tau_1 + \tau_2}$ will be small, which will minimise the impact of $\langle x_1\rangle$ on $\eta_{22}$:
+
+\begin{equation}
+\eta_{22} &= \frac{1}{\langle x_2\rangle} + \underbrace{\frac{1 + b}{2}}_\textrm{large}\frac{1}{\langle x_1\rangle}\underbrace{\frac{\tau_1}{\tau_1 + \tau_2}}_\textrm{$\approx 0$}
+\end{equation}
+
+However if $\tau_1 >> \tau_2 \longrightarrow \frac{\tau_1}{\tau_1 + \tau_2} \approx 1$ we would expect that $\langle x_1 \rangle > \langle x_2 \rangle$ as the lifetime is much longer, so for the same or a similar rate of production $x_2$ will be degraded more quickly.
+
+\begin{equation}
+\eta_{22} &= \underbrace{\frac{1}{\langle x_2\rangle}}_\textrm{$> \frac{1}{\langle x_1\rangle}$} + \underbrace{\frac{1 + b}{2}}_\textrm{large}\underbrace{\frac{1}{\langle x_1\rangle}}_\textrm{$< \frac{1}{\langle x_2\rangle}$}\underbrace{\frac{\tau_1}{\tau_1 + \tau_2}}_\textrm{$\approx 1$}
+\end{equation}
+
+We can see again that a with $b > 1$ $\eta_{22}$ can be minimised by having a longlived protein and shortlived mRNA. This makes sense as thhis will minimise noise propagation... 
+
+\section*{Part D}
+We can use the definition for step size to calculate the average step size:
+
+\begin{equation}
+    \langle s_1\rangle = \sum_k |\delta_k|  \frac{|\delta_k|\langle r_k(x)\rangle}{\sum_l |\delta_l|\langle r_l(x)\rangle}
+\end{equation}
+
+\subsection*{Average step size for production}
+
+We can first calculate the denominator of this equation:
+
+\begin{equation}
+   \begin{split}
+       \sum_l |\delta_l|\langle r_l(x)\rangle &= 1\times0.6\lambda_1 + 2\times0.3\lambda_1 + 3\times0.1\lambda_1\\
+       &= 1.5\lambda_1
+   \end{split} 
+\end{equation}
+
+We can now consider the whole equation:
+
+\begin{equation}
+    \begin{split}
+         \langle s_1^+\rangle &= \sum_k |\delta_k|  \frac{|\delta_k|\langle r_k(x)\rangle}{\sum_l |\delta_l|\langle r_l(x)\rangle} \\
+         &= \sum_k |\delta_k|  \frac{|\delta_k|\langle r_k(x)\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle} \\
+         &= \frac{1^2\times0.6\lambda_1 + 2^2\times0.3\lambda_1 + 3^2\times0.1\lambda_1}{1.5\lambda_1} \\
+         &= \frac{0.6\lambda_1 + 1.2\lambda_1 + 0.9\lambda_1}{1.5\lambda_1}  \\
+         &= \frac{2.7\lambda_1}{1.5\lambda_1} \\
+         &= 1.8
+    \end{split}
+\end{equation}
+
+\subsection*{Total average step size}
+
+We can first calculate the denominator of this equation:
+
+\begin{equation}
+   \begin{split}
+       \sum_l |\delta_l|\langle r_l(x)\rangle &= 1\times0.6\lambda_1 + 2\times0.3\lambda_1 + 3\times0.1\lambda_1 + \beta_1\langle x_1\rangle \\
+       &= 1.5\lambda_1 + \beta_1\langle x_1\rangle
+   \end{split} 
+\end{equation}
+
+We can now consider the whole equation:
+
+\begin{equation}
+    \begin{split}
+         \langle s_1\rangle &= \sum_k |\delta_k|  \frac{|\delta_k|\langle r_k(x)\rangle}{\sum_l |\delta_l|\langle r_l(x)\rangle} \\
+         &= \sum_k |\delta_k|  \frac{|\delta_k|\langle r_k(x)\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle} \\
+         &= \frac{1^2\times0.6\lambda_1 + 2^2\times0.3\lambda_1 + 3^2\times0.1\lambda_1 + \beta_1\langle x_1\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle} \\
+         &= \frac{0.6\lambda_1 + 1.2\lambda_1 + 0.9\lambda_1 + \beta_1\langle x_1\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle}  \\
+         &= \frac{2.7\lambda_1 + \beta_1\langle x_1\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle}
+    \end{split}
+\end{equation}
+
+If we consider this system to be at stationarity we can solve using the equation for change in $\langle x_1\rangle$ and setting this to be zero:
+
+\begin{equation}
+    \begin{split}
+        \frac{d\langle x_1\rangle}{dt} &= \langle \boldsymbol{R}^+_1\rangle - \langle \boldsymbol{R}^-_1\rangle\\
+        &= 1\times0.6\lambda_1 + 2\times0.3\lambda_1 + 3\times0.1\lambda_1 - \beta_1\langle x_1\rangle \\
+        &= 1.5\lambda_1 - \beta_1\langle x_1\rangle
+    \end{split}
+\end{equation}
+
+At stationarity: 
+
+\begin{equation}
+    \begin{split}
+        0 &= 1.5\lambda_1 - \beta_1\langle x_1\rangle \\
+        \beta_1\langle x_1\rangle &= 1.5\lambda_1
+    \end{split}
+\end{equation}
+
+Substituting in to the equation for step size:
+
+\begin{equation}
+    \begin{split}
+        \langle s_1 \rangle &= \frac{2.7\lambda_1 + \beta_1\langle x_1\rangle}{1.5\lambda_1 + \beta_1\langle x_1\rangle} \\
+        &= \frac{2.7\lambda_1 + 1.5\lambda_1}{1.5\lambda_1 + 1.5\lambda_1}  \\
+        &= \frac{4.2\lambda_1 }{3\lambda_1}\\
+        &= 1.4
+    \end{split}
+\end{equation}
+
+\section*{Part E}
+
+<<Setup, echo = F, tidy = T, warning=F, results=F, message=F>>=
+library(ggplot2)
+@
+
+I ran the Gillespie algorithm using the following code:
+
+<<Gillespie, tidy = T>>=
+#Make a function to return bits and set amount of time in each state
+simulate_gillespie2 <- function(lambda, beta, p, cycles = 10000) {
+  
+  #Set up some storage
+  states <- data.frame(x = rep(0, times = 100000))
+  
+  x <- 0
+  xs <- data.frame(x = rep(NA, times = cycles),
+                   time = rep(NA, times = cycles))
+  
+  for (i in 1:cycles) {
+    
+    #Choose wait time
+    time <- wait_time(lambda + beta*x)
+    
+    #Choose reaction 
+    rxn <- choose_reaction(c(lambda, beta*x))
+    
+    #Update time in state prior to change
+    if (i %in% 1000:cycles) {
+      
+      #Only save after stationarity
+      states$x[x] <- states$x[x] + time
+    }
+    
+    xs$x[i] <- x
+    
+    if (i == 1) {xs$time[i] <- time
+    } else {xs$time[i] <- xs$time[i - 1] + time}
+    
+    switch(rxn, 
+           '1' = {x <- x + rgeom(p) + 1}, 
+           '2' = {if (x != 0) {x <- x - 1}})
+    
+  }
+  
+  #Update time in state after change
+  states$x[x] <- states$x[x] + time
+  
+  return(list(xs, states))
+  
+}
+@
+
+Running this with $p = 0.1$ and $p = 0.5$ I generated the following histograms and plots of states of x:
+
+<<run_gillespie, echo = F, warning = F, cache = T>>=
+gs2 <- simulate_gillespie2(10, 2, 0.5, 100000)
+gs3 <- simulate_gillespie2(10, 2, 0.1, 100000)
+@
+
+\begin{figure}
+\centering
+<<plotting, echo = F, fig = T, fig.height= 10, fig.width= 10, message = F, warning = F>>=
+a <- ggplot(gs3[[1]]) + geom_line(aes(x = time, y = x, col = 'red', alpha = 0.4)) + theme_bw() + 
+  theme(legend.position = 'none') + ylab('x1') + xlim(c(0, 500)) + ylim(c(0, 200))  + 
+  labs(title = 'Plot of states over time for p = 0.1')
+b <- ggplot(gs2[[1]]) + geom_line(aes(x = time, y = x, col = 'red', alpha = 0.4)) + theme_bw() + 
+  theme(legend.position = 'none') + ylab('x1') + xlim(c(0, 500)) + ylim(c(0, 200))  + 
+  labs(title = 'Plot of states over time for p = 0.5')
+c <- ggplot(gs3[[2]]) + geom_col(aes(x = 1:1e5, y = x/sum(x), fill = 'red')) + theme_bw() + xlim(c(1, 200)) + 
+  xlab('x1') + ylab('Probability of being in state') + labs(title = 'Distribution of states at stationarity for p = 0.1') + 
+  theme(legend.position = 'none') + ylim(c(0, 0.1))
+d <- ggplot(gs2[[2]]) + geom_col(aes(x = 1:1e5, y = x/sum(x), fill = 'red')) + theme_bw() + xlim(c(1, 200)) + 
+  xlab('x1') + ylab('Probability of being in state') + labs(title = 'Distribution of states at stationarity for p = 0.5') + 
+  theme(legend.position = 'none') + ylim(c(0, 0.1))
+gridExtra::grid.arrange(a, b, c, d, nrow = 2)
+@
+\caption{Histograms of state and blah}
+\label{fig:hists}
+\end{figure}
+
+\end{document}
